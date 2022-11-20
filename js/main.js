@@ -84,30 +84,30 @@
                 canvas_opacity_in: [0, 1, {start: 0, end: 0.1}],
                 canvas_opacity_out: [1, 0, {start: 0.95, end: 1}],
 
-                messageFirst_translateY_start: [20, 0, { start: 0.15, end: 0.2 }],
-                messageSecond_translateY_start: [30, 0, { start: 0.5, end: 0.55 }],
-                messageThird_translateY_start: [30, 0, { start: 0.72, end: 0.77 }],
+                messageFirst_translateY_start: [20, 0, {start: 0.15, end: 0.2}],
+                messageSecond_translateY_start: [30, 0, {start: 0.5, end: 0.55}],
+                messageThird_translateY_start: [30, 0, {start: 0.72, end: 0.77}],
 
-                messageFirst_opacity_start: [0, 1, { start: 0.15, end: 0.2 }],
-                messageSecond_opacity_start: [0, 1, { start: 0.5, end: 0.55 }],
-                messageThird_opacity_start: [0, 1, { start: 0.72, end: 0.77 }],
+                messageFirst_opacity_start: [0, 1, {start: 0.15, end: 0.2}],
+                messageSecond_opacity_start: [0, 1, {start: 0.5, end: 0.55}],
+                messageThird_opacity_start: [0, 1, {start: 0.72, end: 0.77}],
 
-                messageFirst_translateY_end: [0, -20, { start: 0.3, end: 0.35 }],
-                messageSecond_translateY_end: [0, -20, { start: 0.58, end: 0.63 }],
-                messageThird_translateY_end: [0, -20, { start: 0.85, end: 0.9 }],
+                messageFirst_translateY_end: [0, -20, {start: 0.3, end: 0.35}],
+                messageSecond_translateY_end: [0, -20, {start: 0.58, end: 0.63}],
+                messageThird_translateY_end: [0, -20, {start: 0.85, end: 0.9}],
 
-                messageFirst_opacity_end: [1, 0, { start: 0.3, end: 0.35 }],
-                messageSecond_opacity_end: [1, 0, { start: 0.58, end: 0.63 }],
-                messageThird_opacity_end: [1, 0, { start: 0.85, end: 0.9 }],
+                messageFirst_opacity_end: [1, 0, {start: 0.3, end: 0.35}],
+                messageSecond_opacity_end: [1, 0, {start: 0.58, end: 0.63}],
+                messageThird_opacity_end: [1, 0, {start: 0.85, end: 0.9}],
 
-                pinSecond_scaleY: [0.5, 1, { start: 0.5, end: 0.55 }],
-                pinThird_scaleY: [0.5, 1, { start: 0.72, end: 0.77 }],
+                pinSecond_scaleY: [0.5, 1, {start: 0.5, end: 0.55}],
+                pinThird_scaleY: [0.5, 1, {start: 0.72, end: 0.77}],
 
-                pinSecond_opacity_start: [0, 1, { start: 0.5, end: 0.55 }],
-                pinThird_opacity_start: [0, 1, { start: 0.72, end: 0.77 }],
+                pinSecond_opacity_start: [0, 1, {start: 0.5, end: 0.55}],
+                pinThird_opacity_start: [0, 1, {start: 0.72, end: 0.77}],
 
-                pinSecond_opacity_end: [1, 0, { start: 0.58, end: 0.63 }],
-                pinThird_opacity_end: [1, 0, { start: 0.85, end: 0.9 }]
+                pinSecond_opacity_end: [1, 0, {start: 0.58, end: 0.63}],
+                pinThird_opacity_end: [1, 0, {start: 0.85, end: 0.9}]
             }
         },
         {
@@ -117,7 +117,13 @@
             scrollHeight: 0,
             objs: {
                 container: document.querySelector('#scroll-section-3'),
-                canvasCaption: document.querySelector('.canvas-caption')
+                canvasCaption: document.querySelector('.canvas-caption'),
+                canvas: document.querySelector('.image-blend-canvas'),
+                context: document.querySelector('.image-blend-canvas').getContext('2d'),
+                imagesPath: [
+                    './images/blend-image-1.jpg'
+                ],
+                images: []
             },
             values: {
 
@@ -126,11 +132,11 @@
     ];
 
     function setCanvasImages() {
-        let imgElem;
+        let imgElem1;
         for (let i = 0; i < sceneInfo[0].values.videoImageCount; ++i) {
-            imgElem = new Image();
-            imgElem.src = `./video/001/IMG_${6726 + i}.JPG`;
-            sceneInfo[0].objs.videoImages.push(imgElem);
+            imgElem1 = new Image();
+            imgElem1.src = `./video/001/IMG_${6726 + i}.JPG`;
+            sceneInfo[0].objs.videoImages.push(imgElem1);
         }
 
         let imgElem2;
@@ -138,6 +144,13 @@
             imgElem2 = new Image();
             imgElem2.src = `./video/002/IMG_${7027 + i}.JPG`;
             sceneInfo[2].objs.videoImages.push(imgElem2);
+        }
+
+        let imgElem3;
+        for (let i = 0; i < sceneInfo[3].objs.imagesPath.length; ++i) {
+            imgElem3 = new Image();
+            imgElem3.src = sceneInfo[3].objs.imagesPath;
+            sceneInfo[3].objs.images.push(imgElem3);
         }
     }
     setCanvasImages();
@@ -300,6 +313,20 @@
                 break;
 
             case 3:
+                const widthRatio = window.innerWidth / objs.canvas.width;
+                const heightRatio = window.innerHeight / objs.canvas.height;
+                let canvasScaleRatio;
+
+                if (widthRatio <= heightRatio) {
+                    /* 캔버스보다 브라우저 창이 홀쭉한 경우 */
+                    canvasScaleRatio = heightRatio;
+                } else {
+                    /* 캔버스보다 브라우저 창이 납작한 경우 */
+                    canvasScaleRatio = widthRatio;
+                }
+                objs.canvas.style.transform = `scale(${canvasScaleRatio})`;
+                objs.context.drawImage(objs.images[0], 0, 0);
+
                 break;
         }
     }
